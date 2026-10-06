@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Borey · Shop + Fake Transaction</title>
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- RESET & BASE ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: #f9fafc;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ----- NAVIGATION (responsive with hamburger) ----- */
+    nav {
+      background: #1e1e2f;
+      color: white;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+      text-decoration: none;
+    }
+    .nav-brand span {
+      color: #f7b731;
+    }
+
+    .hamburger {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      display: none;
+      line-height: 1;
+      padding: 0 0.25rem;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links li a {
+      color: #eee;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+      padding: 0.5rem 0;
+      display: inline-block;
+      border-bottom: 2px solid transparent;
+    }
+
+    .nav-links li a:hover {
+      color: #f7b731;
+      border-bottom-color: #f7b731;
+    }
+
+    /* ----- MAIN – products grid ----- */
+    main {
+      flex: 1;
+      max-width: 1300px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #1e1e2f;
+      margin-bottom: 1.8rem;
+      border-left: 6px solid #f7b731;
+      padding-left: 1rem;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+      justify-content: center;
+    }
+
+    /* product card */
+    .product-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #eaeef2;
+      cursor: pointer;   /* now it's clickable */
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #f0f2f5;
+      display: block;
+    }
+
+    .product-info {
+      padding: 1.2rem 1rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .product-info h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #1e1e2f;
+      margin-bottom: 0.4rem;
+    }
+
+    .product-info .price {
+      font-weight: 700;
+      color: #f7b731;
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .product-info .btn {
+      margin-top: auto;
+      background: #1e1e2f;
+      color: white;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 40px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;  /* clickable */
+      transition: background 0.2s;
+      border: 1px solid #1e1e2f;
+      font-size: 0.95rem;
+      pointer-events: auto;
+    }
+
+    .product-info .btn i {
+      font-size: 0.9rem;
+    }
+
+    .product-card:hover .btn {
+      background: #f7b731;
+      border-color: #f7b731;
+      color: #1e1e2f;
+    }
+
+    /* ----- FOOTER ----- */
+    footer {
+      background: #1e1e2f;
+      color: #ccc;
+      text-align: center;
+      padding: 1.8rem 1.5rem;
+      margin-top: 3rem;
+      font-size: 1rem;
+      border-top: 1px solid #2d2d44;
+    }
+
+    footer p {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    footer .company {
+      font-weight: 700;
+      color: #f7b731;
+      letter-spacing: 0.5px;
+    }
+
+    /* ----- MODAL / TRANSACTION PAGE (overlay) ----- */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s ease, visibility 0s 0.2s;
+    }
+
+    .modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+      transition: opacity 0.2s ease, visibility 0s 0s;
+    }
+
+    .transaction-card {
+      background: white;
+      border-radius: 32px;
+      max-width: 420px;
+      width: 100%;
+      padding: 2rem 1.8rem;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      position: relative;
+      animation: popIn 0.25s ease;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: #888;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .close-btn:hover {
+      color: #1e1e2f;
+    }
+
+    .transaction-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+      color: #1e1e2f;
+    }
+
+    .transaction-product {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+
+    .transaction-amount {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #f7b731;
+      margin: 0.5rem 0 1rem;
+      letter-spacing: 1px;
+      background: #fef7e8;
+      padding: 0.3rem 1rem;
+      border-radius: 60px;
+      display: inline-block;
+    }
+
+    .qr-wrapper {
+      background: #f2f5f9;
+      padding: 1rem;
+      border-radius: 28px;
+      margin: 1.2rem 0 0.8rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .qr-code {
+      width: 180px;
+      height: 180px;
+      display: block;
+      margin: 0 auto;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background: white;
+      padding: 8px;
+    }
+
+    .timer-section {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #1e1e2f;
+      background: #f0f2f5;
+      padding: 0.7rem 1.2rem;
+      border-radius: 60px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin: 0.8rem 0 0.2rem;
+    }
+
+    .timer-section i {
+      color: #f7b731;
+    }
+
+    .timer-expired {
+      color: #d63031;
+      font-weight: 700;
+      background: #ffe8e8;
+    }
+
+    .timer-expired i {
+      color: #d63031;
+    }
+
+    .transaction-footer {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 1.2rem;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+    }
+
+    /* ----- RESPONSIVE (hamburger) ----- */
+    @media screen and (max-width: 768px) {
+      nav { padding: 0.9rem 1.5rem; }
+      .hamburger { display: block; }
+      .nav-links {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 1.5rem 0 0.5rem;
+        margin-top: 0.8rem;
+        border-top: 1px solid #2d2d44;
+        align-items: flex-start;
+      }
+      nav.show .nav-links { display: flex; }
+      .nav-links li { width: 100%; }
+      .nav-links li a {
+        display: block;
+        padding: 0.7rem 0;
+        font-size: 1.2rem;
+        border-bottom: 1px solid #2d2d44;
+      }
+      .nav-links li:last-child a { border-bottom: none; }
+      .nav-brand { font-size: 1.7rem; }
+    }
+
+    @media screen and (max-width: 480px) {
+      .product-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .section-title { font-size: 1.7rem; }
+      main { padding: 0 1rem; margin: 1.5rem auto; }
+      .product-img { height: 220px; }
+      .transaction-card { padding: 1.8rem 1.2rem; }
+      .qr-code { width: 150px; height: 150px; }
+    }
+
+    @media screen and (min-width: 481px) and (max-width: 768px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    }
+
+    @media screen and (min-width: 1024px) {
+      .product-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVIGATION ========== -->
+  <nav id="mainNav">
+    <a href="#" class="nav-brand">Borey<span>.</span></a>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Shop</a></li>
+      <li><a href="#">Collections</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ========== MAIN – 10 PRODUCTS ========== -->
+  <main>
+    <h2 class="section-title">✨ Borey picks</h2>
+    <div class="product-grid" id="productGrid">
+      <!-- 1 -->
+      <div class="product-card" data-name="Urban Backpack" data-price="59.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop&auto=format" alt="Minimalist backpack">
+        <div class="product-info">
+          <h3>Urban Backpack</h3>
+          <div class="price">$59.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+      <!-- 2 -->
+      <div class="product-card" data-name="Wireless Headphones" data-price="89.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop&auto=format" alt="Wireless headphones">
+        <div class="product-info">
+          <h3>Wireless Headphones</h3>
+          <div class="price">$89.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+      <!-- 3 -->
+      <div class="product-card" data-name="Smart Watch" data-price="129.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop&auto=format" alt="Smart watch">
+        <div class="product-info">
+          <h3>Smart Watch</h3>
+          <div class="price">$129.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+      <!-- 4 -->
+      <div class="product-card" data-name="Polarized Shades" data-price="39.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop&auto=format" alt="Sunglasses">
+        <div class="product-info">
+          <h3>Polarized Shades</h3>
+          <div class="price">$39.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+      <!-- 5 -->
+      <div class="product-card" data-name="Running Sneakers" data-price="74.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop&auto=format" alt="Sneakers">
+        <div class="product-info">
+          <h3>Running Sneakers</h3>
+          <div class="price">$74.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+      <!-- 6 -->
+      <div class="product-card" data-name="Mirrorless Camera" data-price="549.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=300&fit=crop&auto=format" alt="Camera">
+        <div class="product-info">
+          <h3>Mirrorless Camera</h3>
+          <div class="price">$549.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+      <!-- 7 -->
+      <div class="product-card" data-name="Ceramic Mug" data-price="18.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=300&fit=crop&auto=format" alt="Coffee mug">
+        <div class="product-info">
+          <h3>Ceramic Mug</h3>
+          <div class="price">$18.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+      <!-- 8 -->
+      <div class="product-card" data-name="Fiddle Leaf Fig" data-price="34.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400&h=300&fit=crop&auto=format" alt="Potted plant">
+        <div class="product-info">
+          <h3>Fiddle Leaf Fig</h3>
+          <div class="price">$34.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+      <!-- 9 -->
+      <div class="product-card" data-name="Hardcover Journal" data-price="14.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400&h=300&fit=crop&auto=format" alt="Notebook">
+        <div class="product-info">
+          <h3>Hardcover Journal</h3>
+          <div class="price">$14.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+      <!-- 10 -->
+      <div class="product-card" data-name="Insulated Bottle" data-price="27.99">
+        <img class="product-img" src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=300&fit=crop&auto=format" alt="Water bottle">
+        <div class="product-info">
+          <h3>Insulated Bottle</h3>
+          <div class="price">$27.99</div>
+          <div class="btn"><i class="fas fa-shopping-bag"></i> Add to cart</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer>
+    <p>
+      <i class="far fa-copyright"></i> 
+      <span class="company">Borey</span> — All rights reserved. 
+      <span style="opacity:0.7;">2025</span>
+    </p>
+  </footer>
+
+  <!-- ========== FAKE TRANSACTION MODAL (hidden by default) ========== -->
+  <div class="modal-overlay" id="transactionModal">
+    <div class="transaction-card">
+      <button class="close-btn" id="closeModalBtn">&times;</button>
+      <h2>💸 Scan to pay</h2>
+      <div class="transaction-product" id="modalProductName">Product</div>
+      <div class="transaction-amount" id="modalAmount">$0.00</div>
+
+      <div class="qr-wrapper">
+        <img class="qr-code" id="qrImage" src="" alt="Fake QR code">
+      </div>
+
+      <div class="timer-section" id="timerBox">
+        <i class="fas fa-hourglass-half"></i>
+        <span id="timerDisplay">60s</span>
+      </div>
+
+      <div class="transaction-footer">
+        <i class="fas fa-lock" style="margin-right: 0.3rem;"></i> Fake transaction · demo only
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+    (function() {
+      // ----- HAMBURGER NAVIGATION -----
+      const nav = document.getElementById('mainNav');
+      const hamburger = document.getElementById('hamburgerBtn');
+
+      hamburger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        nav.classList.toggle('show');
+      });
+
+      document.querySelectorAll('.nav-links li a').forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 768) nav.classList.remove('show');
+        });
+      });
+
+      document.addEventListener('click', function(event) {
+        if (window.innerWidth <= 768 && nav.classList.contains('show')) {
+          if (!nav.contains(event.target)) nav.classList.remove('show');
+        }
+      });
+
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) nav.classList.remove('show');
+      });
+
+      // ----- TRANSACTION MODAL LOGIC -----
+      const modal = document.getElementById('transactionModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const modalProductName = document.getElementById('modalProductName');
+      const modalAmount = document.getElementById('modalAmount');
+      const qrImage = document.getElementById('qrImage');
+      const timerDisplay = document.getElementById('timerDisplay');
+      const timerBox = document.getElementById('timerBox');
+
+      let countdownInterval = null;       // holds interval ID
+      let timeLeft = 60;                 // seconds
+
+      // ----- FAKE QR CODE GENERATOR (SVG data URI) -----
+      // Generates a pseudo-random QR-like pattern based on a string seed.
+      function generateFakeQR(seedText = 'Borey') {
+        // simple hash from string to get consistent but random-looking pattern
+        let hash = 0;
+        for (let i = 0; i < seedText.length; i++) {
+          hash = ((hash << 5) - hash) + seedText.charCodeAt(i);
+          hash |= 0;
+        }
+
+        // Use absolute hash for deterministic pattern
+        const absHash = Math.abs(hash) || 12345;
+        const size = 21; // typical QR grid size (21x21)
+        const cellSize = 8; // each cell in px (svg units)
+        const svgSize = size * cellSize;
+
+        // helper to get pseudo-random value from position
+        function cellValue(row, col) {
+          // simple pseudo-random based on hash, row, col
+          const val = (absHash * (row + 1) * (col + 3) + row * 31 + col * 17) % 7;
+          return val > 3 ? 1 : 0; // ~57% chance of black
+        }
+
+        // force finder patterns in the three corners
+        function isFinderPattern(row, col) {
+          // top-left
+          if (row < 7 && col < 7) {
+            // outer ring and center
+            if (row === 0 || row === 6 || col === 0 || col === 6) return 1;
+            if (row >= 2 && row <= 4 && col >= 2 && col <= 4) return 1;
+            return 0;
+          }
+          // top-right (shifted)
+          if (row < 7 && col >= size - 7) {
+            const c = col - (size - 7);
+            if (row === 0 || row === 6 || c === 0 || c === 6) return 1;
+            if (row >= 2 && row <= 4 && c >= 2 && c <= 4) return 1;
+            return 0;
+          }
+          // bottom-left
+          if (row >= size - 7 && col < 7) {
+            const r = row - (size - 7);
+            if (r === 0 || r === 6 || col === 0 || col === 6) return 1;
+            if (r >= 2 && r <= 4 && col >= 2 && col <= 4) return 1;
+            return 0;
+          }
+          // timing pattern (optional)
+          if (row === 6 || col === 6) {
+            if (row === 6 && col === 6) return 1;
+            return (row + col) % 2 === 0 ? 1 : 0;
+          }
+          // default random
+          return cellValue(row, col);
+        }
+
+        let rects = '';
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            const val = isFinderPattern(r, c);
+            if (val) {
+              const x = c * cellSize;
+              const y = r * cellSize;
+              rects += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="#0f0f1a" />`;
+            }
+          }
+        }
+
+        // background
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}">
+          <rect width="${svgSize}" height="${svgSize}" fill="#ffffff" />
+          ${rects}
+        </svg>`;
+
+        return 'data:image/svg+xml,' + encodeURIComponent(svg);
+      }
+
+      // ----- FUNCTION TO OPEN MODAL FOR A PRODUCT -----
+      function openTransaction(productName, price) {
+        // set text
+        modalProductName.textContent = productName;
+        modalAmount.textContent = `$${price}`;
+
+        // generate QR with product name + price as seed for variation
+        const qrSeed = `${productName}-${price}-Borey`;
+        qrImage.src = generateFakeQR(qrSeed);
+        qrImage.alt = `QR code for ${productName} $${price}`;
+
+        // reset timer
+        timeLeft = 60;
+        updateTimerDisplay();
+        timerBox.classList.remove('timer-expired');
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        // start countdown
+        countdownInterval = setInterval(() => {
+          timeLeft -= 1;
+          updateTimerDisplay();
+
+          if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            timerBox.classList.add('timer-expired');
+            timerDisplay.textContent = 'EXPIRED';
+            // you could also disable QR or show message, but keep simple
+          }
+        }, 1000);
+
+        // show modal
+        modal.classList.add('active');
+      }
+
+      function updateTimerDisplay() {
+        if (timeLeft > 0) {
+          timerDisplay.textContent = `${timeLeft}s`;
+        } else {
+          timerDisplay.textContent = '0s';
+        }
+      }
+
+      // ----- CLOSE MODAL + STOP TIMER -----
+      function closeModal() {
+        modal.classList.remove('active');
+        if (countdownInterval) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+        }
+        // reset timer display (optional)
+        timeLeft = 60;
+        timerDisplay.textContent = '60s';
+        timerBox.classList.remove('timer-expired');
+      }
+
+      // close on button click
+      closeModalBtn.addEventListener('click', closeModal);
+
+      // close when clicking outside the card (on overlay background)
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      // close on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+          closeModal();
+        }
+      });
+
+      // ----- ATTACH CLICK LISTENERS TO ALL PRODUCT CARDS -----
+      const productCards = document.querySelectorAll('.product-card');
+      productCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+          // If user clicked the "Add to cart" button, we still open the transaction (since it's fake)
+          // But we prevent the button's default? There's no default, it's a div.
+          // We want the whole card to be clickable.
+          const productName = this.dataset.name;
+          const price = this.dataset.price;
+          if (productName && price) {
+            openTransaction(productName, price);
+          }
+        });
+      });
+
+      // ensure the button inside doesn't create double events (it's inside card, so same click)
+      // but if user clicks directly on .btn, the card click still fires (bubbles) – fine.
+    })();
+  </script>
+</body>
+</html>
